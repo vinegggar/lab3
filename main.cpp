@@ -78,7 +78,7 @@ int main()
         for (Point p: test) {
             drawPoint(window, p);
         }
-        Hull::setMethod(new Jarvis);
+        Hull::setMethod(new Graham);
         drawHull(window, test, Color::Blue, 2);
         window.display();
     }

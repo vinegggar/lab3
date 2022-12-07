@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -133,13 +134,40 @@ Point center_of_mass(vector<Point>& points){
 vector<Point> Graham::getConvexHull(vector<Point> &points) {
     if (points.size()<3) return points;
     vector<Point> hull;
-    Point center = center_of_mass(points);
-
+    sort(points.begin(), points.end(), [](Point a, Point b) {
+        return a.y < b.y || (a.y == b.y && a.x < b.x);
+    });
+    //sort the points by polar angle with respect to the lowest point
+    Point lowest = points[0];
+    sort(points.begin()+1, points.end(), [lowest](Point a, Point b) {
+        return cross_product(lowest, a, b) > 0;
+    });
+    hull.push_back(points[0]);
+    hull.push_back(points[1]);
+    for (int i = 2; i < points.size(); i++) {
+        while (cross_product(hull[hull.size()-2], hull[hull.size()-1], points[i]) < 0){
+            hull.pop_back();
+        }
+        hull.push_back(points[i]);
+    }
+    return hull;
 }
 
 /*
  * 6. Recursive
  */
+
+vector<Point> Recursive::getConvexHull(vector<Point> &points){
+    if (points.size()<3) return points;
+    vector<Point> hull;
+    sort(points.begin(), points.end(), [](Point a, Point b) {
+        return a.x < b.x || (a.x==b.x && a.y<b.y);
+    });
+    Point left = points[0], right = points.back();
+
+
+
+}
 
 class Hull {
 private:
