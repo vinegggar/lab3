@@ -75,11 +75,67 @@ vector<Point> Kirkpatrick::getConvexHull(vector<Point>& points) {
 vector<Point> Jarvis::getConvexHull(vector<Point>& points) {
     if (points.size()<3) return points;
     vector<Point> hull;
+    sort(points.begin(), points.end(), [](Point a, Point b) {
+        return a.x < b.x || (a.x==b.x && a.y<b.y);
+    });
+    Point left = points[0], right = points.back();
+    vector <Point> upper, lower;
+
+    for(auto & point : points){
+        if (cross_product(left, right, point) < 0) lower.push_back(point);
+        else if (cross_product(left, right, point) > 0) upper.push_back(point);
+    }
+
+    upper.push_back(right);
+
+    hull.push_back(left);
+    auto on_hull = hull[0]; //upper part of hull
+    for (int i=0;i<upper.size();i++){
+        bool isHullEdge = true;
+        for(int j=0;j<upper.size();j++){
+            if (cross_product(upper[i], on_hull, upper[j]) < 0) isHullEdge = false;
+        }
+        if (!isHullEdge) continue;
+        hull.push_back(upper[i]);
+        on_hull = upper[i];
+    }
+    hull.push_back(right);
+
+    lower.push_back(left);
+
+    on_hull = hull[hull.size()-1];
+    for (int i=lower.size()-1;i>=0;i--){ //analogous process for lower part of hull
+        bool isHullEdge = true;
+        for(int j=lower.size()-1;j>=0;j--){
+            if (cross_product(lower[i], on_hull, lower[j]) < 0) isHullEdge = false;
+        }
+        if (!isHullEdge) continue;
+        hull.push_back(lower[i]);
+        on_hull = lower[i];
+    }
+
+    return hull;
 }
 
 /*
  * 5. Graham
  */
+
+Point center_of_mass(vector<Point>& points){
+    double x = 0, y = 0;
+    for (auto & point : points){
+        x += point.x;
+        y += point.y;
+    }
+    return {float(x)/points.size(), float(y)/points.size()};
+}
+
+vector<Point> Graham::getConvexHull(vector<Point> &points) {
+    if (points.size()<3) return points;
+    vector<Point> hull;
+    Point center = center_of_mass(points);
+
+}
 
 /*
  * 6. Recursive

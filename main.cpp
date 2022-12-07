@@ -43,19 +43,18 @@ void drawHull(RenderWindow &window, vector<Point> points, Color color=Color::Blu
     drawPolygon(window, convex.getHull(), color, thickness);
 }
 
+vector<Point> generatePoints(int n) {
+    vector<Point> points;
+    for (int i = 0; i < n; i++) {
+        points.push_back(Point(rand() % 600 + 100, rand() % 400 + 100));
+    }
+    return points;
+}
+
 int main()
 {
-    vector <Point> test = {
-                Point(350, 500),
-                Point(500,400),
-                Point(400,300),
-                Point(600, 500),
-                Point(700, 300),
-                Point(450, 200),
-                Point(150,200),
-                Point(100,100),
-                Point(650, 100)
-    };
+    srand(time(nullptr));
+    vector <Point> test = generatePoints(42);
 
     RenderWindow window(VideoMode(800, 600), "Convex Hull");
     window.setView(View(FloatRect(0, 600, 800, -600)));
@@ -79,7 +78,7 @@ int main()
         for (Point p: test) {
             drawPoint(window, p);
         }
-        Hull::setMethod(new Kirkpatrick);
+        Hull::setMethod(new Jarvis);
         drawHull(window, test, Color::Blue, 2);
         window.display();
     }
