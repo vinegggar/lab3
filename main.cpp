@@ -53,7 +53,7 @@ vector<Point> generatePoints(int n) {
 
 int main()
 {
-    srand(time(nullptr));
+    srand(time(nullptr)%100);
     vector <Point> test = generatePoints(42);
 
     RenderWindow window(VideoMode(800, 600), "Convex Hull");
@@ -78,7 +78,7 @@ int main()
         for (Point p: test) {
             drawPoint(window, p);
         }
-        Hull::setMethod(new Graham);
+        Hull::setMethod(new Recursive);
         drawHull(window, test, Color::Blue, 2);
         window.display();
     }

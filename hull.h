@@ -37,11 +37,15 @@ void erasePoints(vector<Point>&endPoints){
         if (cross_product(endPoints[i], endPoints[i-1], endPoints[i+1])<0){
             endPoints.erase(endPoints.begin()+i);
             erasePoints(endPoints);
+            break;
         }
     }
 }
 
 vector<Point> Kirkpatrick::getConvexHull(vector<Point>& points) {
+    for (auto & point : points) {
+        if (point.y != (int)point.y) throw invalid_argument("y is not integer");
+    }
     if (points.size() < 3) return points;
     vector <Point> hull;
     sort(points.begin(), points.end(), [](Point a, Point b) {
@@ -122,14 +126,6 @@ vector<Point> Jarvis::getConvexHull(vector<Point>& points) {
  * 5. Graham
  */
 
-Point center_of_mass(vector<Point>& points){
-    double x = 0, y = 0;
-    for (auto & point : points){
-        x += point.x;
-        y += point.y;
-    }
-    return {float(x)/points.size(), float(y)/points.size()};
-}
 
 vector<Point> Graham::getConvexHull(vector<Point> &points) {
     if (points.size()<3) return points;
@@ -157,17 +153,56 @@ vector<Point> Graham::getConvexHull(vector<Point> &points) {
  * 6. Recursive
  */
 
-vector<Point> Recursive::getConvexHull(vector<Point> &points){
-    if (points.size()<3) return points;
-    vector<Point> hull;
+int findLargestTriangle(vector<Point>&points, Point a, Point b){
+    int max_index = 0;
+    double max_area = 0;
+    for (int i=0;i<points.size();i++){
+        //area of triangle = 0.5*|AB x AC|
+        double area = 0.5*abs(cross_product(a, b, points[i]));
+        if (area > max_area){
+            max_area = area;
+            max_index = i;
+        }
+    }
+    return max_index;
+}
+
+void addToHull(vector<Point>&points, Point a, Point b, vector<Point>&hull){
+    int index = findLargestTriangle(points, a, b);
+    if (index == 0) return;
+    hull.push_back(points[index]);
+    vector<Point> left = {a}, right = {b};
+    for (int i=0;i<points.size();i++){
+        if (cross_product(a, points[index], points[i]) > 0) left.push_back(points[i]);
+        else if (cross_product(points[index], b, points[i]) > 0) right.push_back(points[i]);
+    }
+    left.push_back(points[index]), right.push_back(points[index]);
+    addToHull(left, a, points[index], hull);
+    addToHull(right, points[index], b, hull);
+}
+
+
+vector<Point> Recursive::getConvexHull(vector<Point> &points) {
+    if (points.size() < 3) return points;
     sort(points.begin(), points.end(), [](Point a, Point b) {
-        return a.x < b.x || (a.x==b.x && a.y<b.y);
+        return a.x < b.x || (a.x == b.x && a.y < b.y);
     });
     Point left = points[0], right = points.back();
-
-
-
+    vector<Point> upper={left,right}, lower={left,right};
+    for (auto &point : points) {
+        if (cross_product(left, right, point) < 0) lower.push_back(point);
+        else if (cross_product(left, right, point) > 0) upper.push_back(point);
+    }
+    vector <Point> hull = {left, right};
+    addToHull(upper, left, right, hull);
+    addToHull(lower, right, left, hull);
+    //sort by polar angle with respect to the leftmost point to get correct order
+    sort(hull.begin(), hull.end(), [left](Point a, Point b) {
+        return cross_product(left, a, b) > 0;
+    });
+    return hull;
 }
+
 
 class Hull {
 private:
