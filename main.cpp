@@ -1,6 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include "hull.h"
 #include <cmath>
+
+typedef pair <Point, Point> Edge;
+
 using namespace sf;
 using namespace std;
 
@@ -43,13 +46,15 @@ void drawHull(RenderWindow &window, vector<Point> points, Color color=Color::Blu
     drawPolygon(window, convex.getHull(), color, thickness);
 }
 
+
 vector<Point> generatePoints(int n) {
     vector<Point> points;
     for (int i = 0; i < n; i++) {
-        points.push_back(Point(rand() % 600 + 100, rand() % 400 + 100));
+        points.emplace_back(rand() % 600 + 100, rand() % 400 + 100);
     }
     return points;
 }
+
 
 int main()
 {
@@ -78,9 +83,15 @@ int main()
         for (Point p: test) {
             drawPoint(window, p);
         }
+//        vector <Edge> vor = Voronoi(test);
+//        for (Edge e: vor) {
+//            drawLine(window, e.first, e.second, Color::Red, 2);
+//        }
+
         Hull::setMethod(new Recursive);
         drawHull(window, test, Color::Blue, 2);
         window.display();
+
     }
     return 0;
 }

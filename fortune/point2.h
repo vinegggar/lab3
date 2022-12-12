@@ -13,8 +13,7 @@ struct Point {
     }
 };
 
-double cross_product(Point A, Point B, Point C) {
+double cross_prod(Point A, Point B, Point C) {
     //cross product of vectors AB and AC
     return (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
 }
-
