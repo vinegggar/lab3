@@ -1,8 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "hull.h"
 #include <cmath>
-
-typedef pair <Point, Point> Edge;
+#include "delaunay.h"
 
 using namespace sf;
 using namespace std;
@@ -59,7 +58,7 @@ vector<Point> generatePoints(int n) {
 int main()
 {
     srand(time(nullptr)%100);
-    vector <Point> test = generatePoints(42);
+    vector <Point> test = generatePoints(15);
 
     RenderWindow window(VideoMode(800, 600), "Convex Hull");
     window.setView(View(FloatRect(0, 600, 800, -600)));
@@ -83,15 +82,13 @@ int main()
         for (Point p: test) {
             drawPoint(window, p);
         }
-//        vector <Edge> vor = Voronoi(test);
-//        for (Edge e: vor) {
-//            drawLine(window, e.first, e.second, Color::Red, 2);
-//        }
 
-        Hull::setMethod(new Recursive);
-        drawHull(window, test, Color::Blue, 2);
+        //draw triangulation
+        vector<Triangle> tri = triangulate(test);
+        for (Triangle t: tri) {
+            drawPolygon(window, {t.a, t.b, t.c}, Color::Blue, 2);
+        }
         window.display();
-
     }
     return 0;
 }

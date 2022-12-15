@@ -1,7 +1,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
-#include "point2.h"
+#include "../point.h"
 
 using namespace std;
 
