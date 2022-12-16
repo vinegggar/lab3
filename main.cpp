@@ -1,7 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include "hull.h"
 #include <cmath>
-#include "delaunay.h"
+#include "voronoi.h"
+#include <iostream>
 
 using namespace sf;
 using namespace std;
@@ -26,7 +27,7 @@ void drawLine(RenderWindow &window, Point p1, Point p2, Color color=Color::Blue,
 }
 
 void drawPoint(RenderWindow &window, Point p) {
-    CircleShape circle(3);
+    CircleShape circle(2);
     circle.setFillColor(Color::Red);
     circle.setPosition(p.x, p.y);
     window.draw(circle);
@@ -49,7 +50,7 @@ void drawHull(RenderWindow &window, vector<Point> points, Color color=Color::Blu
 vector<Point> generatePoints(int n) {
     vector<Point> points;
     for (int i = 0; i < n; i++) {
-        points.emplace_back(rand() % 600 + 100, rand() % 400 + 100);
+        points.emplace_back(rand() % 600+100, rand() % 400+100);
     }
     return points;
 }
@@ -58,9 +59,19 @@ vector<Point> generatePoints(int n) {
 int main()
 {
     srand(time(nullptr)%100);
-    vector <Point> test = generatePoints(15);
+    vector <Point> test = generatePoints(42);
+    vector <Point> test2 = {
+            Point(170, 100),
+            Point(265, 450),
+            Point(400, 100),
+            Point(386, 420),
+            Point(200, 510),
+            Point(305, 503),
+            Point(490, 140),
+            Point(146, 274)
+    };
 
-    RenderWindow window(VideoMode(800, 600), "Convex Hull");
+    RenderWindow window(VideoMode(800, 600), "Lab 3");
     window.setView(View(FloatRect(0, 600, 800, -600)));
     while (window.isOpen())
     {
@@ -83,10 +94,29 @@ int main()
             drawPoint(window, p);
         }
 
-        //draw triangulation
-        vector<Triangle> tri = triangulate(test);
-        for (Triangle t: tri) {
-            drawPolygon(window, {t.a, t.b, t.c}, Color::Blue, 2);
+        /**
+         * draw convex hull of points (and choose algorithm)
+         */
+//        Hull::setMethod(new Kirkpatrick);
+//        Hull::setMethod(new Jarvis);
+//        Hull::setMethod(new Graham);
+//        Hull::setMethod(new Recursive);
+//
+//        drawHull(window, test, Color::Magenta, 2);
+
+        /**
+         * draw Delaunay triangulation
+         */
+//        vector<Triangle> tri = delaunay(test);
+//        for (Triangle t: tri) {
+//            drawPolygon(window, {t.a, t.b, t.c}, Color::Green, 2);
+//        }
+        /**
+         * draw Voronoi diagram
+         */
+        vector<Edge> vor = voronoi(test);
+        for (Edge e: vor) {
+            drawLine(window, e.a, e.b, Color::Blue, 2);
         }
         window.display();
     }

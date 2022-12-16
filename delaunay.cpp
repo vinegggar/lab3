@@ -24,7 +24,12 @@ struct Circle {
     double x, y, radius;
     Circle() = default;
     bool isInside(Point const& p) const;
+    Point getCenter() const;
 };
+
+Point Circle::getCenter() const {
+    return {x, y};
+}
 
 bool Circle::isInside(Point const& p) const {
     return (p.x - x) * (p.x - x) + (p.y - y) * (p.y - y) <= radius;
@@ -106,7 +111,14 @@ vector<Triangle> triangulate(vector<Point>& points){
             return find(badTriangles.begin(), badTriangles.end(), t) != badTriangles.end();
         }), d.end());
     }
-    d.erase(remove_if(d.begin(), d.end(), [&super](Triangle const& t)
-    {return t.shareNode(super);}), d.end());
     return d;
+}
+
+vector <Triangle> delaunay(vector<Point>& points) {
+    vector <Triangle> triangles = triangulate(points);
+    vector <Triangle> result;
+    for (Triangle& triangle: triangles) {
+        if (!triangle.shareNode(superTriangle(points))) result.push_back(triangle);
+    }
+    return result;
 }

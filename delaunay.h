@@ -14,6 +14,7 @@ struct Circle {
     double x, y, radius;
     Circle() = default;
     bool isInside(Point const& p) const;
+    Point getCenter() const;
 };
 
 struct Triangle {
@@ -40,5 +41,5 @@ Triangle superTriangle(vector<Point>& points);
 
 vector<Triangle> triangulate(vector<Point>& points);
 
-vector<Edge> voronoi(vector<Point>& points);
+vector <Triangle> delaunay(vector<Point>& points);
 
